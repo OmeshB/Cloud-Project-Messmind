@@ -1,31 +1,8 @@
 import { useEffect, useState } from "react";
 import { TrendingUp, AlertCircle, Users, Utensils, Star } from "lucide-react";
 import Navbar from "@/components/Navbar";
-
-type MenuItem = {
-  Id: number;
-  MealDate: string;
-  MealType: string;
-  DishName: string;
-  QuantityPrepared: number;
-};
-
-type FeedbackItem = {
-  Id: number;
-  StudentName: string;
-  DishName: string;
-  Rating: number;
-  Comment: string;
-  CreatedAt: string;
-};
-
-type DashboardData = {
-  totalPrepared: number;
-  totalFeedback: number;
-  averageRating: string;
-  popularMeal: string;
-  alerts: string[];
-};
+import type { DashboardData, FeedbackItem, MenuItem } from "../lib/api";
+import { getDashboard, getFeedback, getMenu } from "../lib/api";
 
 export default function Dashboard() {
   const [dashboardData, setDashboardData] = useState<DashboardData | null>(null);
@@ -37,15 +14,11 @@ export default function Dashboard() {
     try {
       setLoading(true);
 
-      const [dashboardRes, menuRes, feedbackRes] = await Promise.all([
-        fetch("/api/dashboard"),
-        fetch("/api/menu"),
-        fetch("/api/feedback"),
+      const [dashboardJson, menuJson, feedbackJson] = await Promise.all([
+        getDashboard(),
+        getMenu(),
+        getFeedback(),
       ]);
-
-      const dashboardJson = await dashboardRes.json();
-      const menuJson = await menuRes.json();
-      const feedbackJson = await feedbackRes.json();
 
       setDashboardData(dashboardJson);
       setMenuItems(Array.isArray(menuJson) ? menuJson : []);

@@ -1,14 +1,8 @@
 import { useEffect, useState } from "react";
 import { Save } from "lucide-react";
 import Navbar from "@/components/Navbar";
-
-type MenuItem = {
-  Id: number;
-  MealDate: string;
-  MealType: string;
-  DishName: string;
-  QuantityPrepared: number;
-};
+import type { MenuItem } from "../lib/api";
+import { addMenu, getMenu } from "../lib/api";
 
 export default function Menu() {
   const [formData, setFormData] = useState({
@@ -23,8 +17,7 @@ export default function Menu() {
 
   const fetchMenuItems = async () => {
     try {
-      const response = await fetch("/api/menu");
-      const data = await response.json();
+      const data = await getMenu();
       setMenuItems(data);
     } catch (error) {
       console.error("Error fetching menu items:", error);
@@ -50,24 +43,12 @@ export default function Menu() {
     setLoading(true);
 
     try {
-      const response = await fetch("/api/menu", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          date: formData.date,
-          mealType: formData.mealType,
-          dishName: formData.dishName,
-          quantityPrepared: formData.quantity,
-        }),
+      await addMenu({
+        date: formData.date,
+        mealType: formData.mealType,
+        dishName: formData.dishName,
+        quantityPrepared: formData.quantity,
       });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.message || "Failed to add menu item");
-      }
 
       alert("Menu item added successfully!");
 

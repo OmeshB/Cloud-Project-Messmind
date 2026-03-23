@@ -1,13 +1,8 @@
 import { useEffect, useState } from "react";
 import { TrendingUp, AlertTriangle, CheckCircle } from "lucide-react";
 import Navbar from "@/components/Navbar";
-
-type PredictionData = {
-  predictedDemand: number;
-  topDish: string;
-  lowDemandDishes: { dish: string; quantity: number }[];
-  suggestion: string;
-};
+import type { PredictionData } from "../lib/api";
+import { getPrediction } from "../lib/api";
 
 export default function Prediction() {
   const [data, setData] = useState<PredictionData | null>(null);
@@ -16,8 +11,7 @@ export default function Prediction() {
   useEffect(() => {
     const fetchPrediction = async () => {
       try {
-        const res = await fetch("/api/prediction");
-        const json = await res.json();
+        const json = await getPrediction();
         setData(json);
       } catch (err) {
         console.error("Prediction error:", err);
@@ -57,7 +51,6 @@ export default function Prediction() {
 
         {data && (
           <>
-            {/* Top Cards */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-8">
               <div className="bg-white rounded-xl p-8 border shadow-sm">
                 <div className="flex justify-between mb-4">
@@ -104,7 +97,6 @@ export default function Prediction() {
               </div>
             </div>
 
-            {/* Suggestion Box */}
             <div className="bg-white rounded-xl p-8 border shadow-sm">
               <h2 className="text-2xl font-bold mb-4">
                 NutriCast Recommendation

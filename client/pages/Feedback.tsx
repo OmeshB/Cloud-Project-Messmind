@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Send, Star } from "lucide-react";
 import Navbar from "@/components/Navbar";
+import { addFeedback } from "../lib/api";
 
 export default function Feedback() {
   const [formData, setFormData] = useState({
@@ -27,24 +28,12 @@ export default function Feedback() {
     setLoading(true);
 
     try {
-      const response = await fetch("/api/feedback", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          studentName: "Anonymous", // you can improve later
-          dishName: formData.meal,
-          rating: formData.rating,
-          comment: formData.comment,
-        }),
+      await addFeedback({
+        studentName: "Anonymous",
+        dishName: formData.meal,
+        rating: formData.rating,
+        comment: formData.comment,
       });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.message || "Failed");
-      }
 
       setSubmitted(true);
 
