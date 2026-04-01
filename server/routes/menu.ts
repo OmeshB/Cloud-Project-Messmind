@@ -20,7 +20,7 @@ export const getMenu: RequestHandler = async (_req, res) => {
 
 export const addMenu: RequestHandler = async (req, res) => {
   try {
-    const { date, mealType, dishName, quantityPrepared } = req.body;
+    const { date, mealType, dishName, quantityPrepared, imageUrl } = req.body;
 
     const pool = await getDbPool();
     await pool
@@ -29,9 +29,10 @@ export const addMenu: RequestHandler = async (req, res) => {
       .input("MealType", mealType)
       .input("DishName", dishName)
       .input("QuantityPrepared", Number(quantityPrepared))
+      .input("ImageUrl", imageUrl || null)   // ✅ NEW
       .query(`
-        INSERT INTO MenuItems (MealDate, MealType, DishName, QuantityPrepared)
-        VALUES (@MealDate, @MealType, @DishName, @QuantityPrepared)
+        INSERT INTO MenuItems (MealDate, MealType, DishName, QuantityPrepared, ImageUrl)
+        VALUES (@MealDate, @MealType, @DishName, @QuantityPrepared, @ImageUrl)
       `);
 
     res.status(201).json({ message: "Menu added successfully" });

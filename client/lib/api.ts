@@ -30,6 +30,7 @@ export type MenuItem = {
   MealDate: string;
   MealType: string;
   DishName: string;
+  imageUrl?: string;  
   QuantityPrepared: number;
 };
 
@@ -63,6 +64,7 @@ export async function addMenu(payload: {
   mealType: string;
   dishName: string;
   quantityPrepared: string;
+  imageUrl?: string;   // ✅ ADD THIS
 }) {
   return apiRequest("/api/menu", {
     method: "POST",

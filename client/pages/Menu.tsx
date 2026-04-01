@@ -64,11 +64,12 @@ export default function Menu() {
 
       // Add menu item
       await addMenu({
-        date: formData.date,
-        mealType: formData.mealType,
-        dishName: formData.dishName,
-        quantityPrepared: formData.quantity,
-      });
+      date: formData.date,
+      mealType: formData.mealType,
+      dishName: formData.dishName,
+      quantityPrepared: formData.quantity,
+      imageUrl: uploadedImageUrl,   // ✅ NOW VALID
+    });
 
       alert("Menu item added successfully!");
 
@@ -198,10 +199,14 @@ export default function Menu() {
           <h2 className="text-2xl font-bold mb-6">Recent Menu Items</h2>
 
           {menuItems.map((item) => (
-            <div key={item.Id} className="p-3 border mb-2 rounded">
-              {item.DishName} ({item.QuantityPrepared})
-            </div>
-          ))}
+          <div key={item.Id} className="p-3 border mb-2 rounded">
+            <div>{item.DishName} ({item.QuantityPrepared})</div>
+
+            {item.imageUrl && (
+              <img src={item.imageUrl} className="w-24 mt-2 rounded" />
+            )}
+          </div>
+        ))}
         </div>
       </main>
     </div>
