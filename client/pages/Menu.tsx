@@ -4,6 +4,8 @@ import Navbar from "@/components/Navbar";
 import type { MenuItem } from "../lib/api";
 import { addMenu, getMenu } from "../lib/api";
 
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "";
+
 export default function Menu() {
   const [formData, setFormData] = useState({
     mealType: "breakfast",
@@ -52,10 +54,10 @@ export default function Menu() {
         const formDataImg = new FormData();
         formDataImg.append("image", file);
 
-        const res = await fetch("/api/upload", {
-          method: "POST",
-          body: formDataImg,
-        });
+        const res = await fetch(`${API_BASE_URL}/api/upload`, {
+        method: "POST",
+        body: formDataImg,
+      });
 
         const data = await res.json();
         uploadedImageUrl = data.imageUrl;
