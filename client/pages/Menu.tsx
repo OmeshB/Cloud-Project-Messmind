@@ -14,6 +14,8 @@ export default function Menu() {
 
   const [menuItems, setMenuItems] = useState<MenuItem[]>([]);
   const [loading, setLoading] = useState(false);
+  const [file, setFile] = useState<File | null>(null);
+  const [imageUrl, setImageUrl] = useState("");
 
   const fetchMenuItems = async () => {
     try {
@@ -29,7 +31,7 @@ export default function Menu() {
   }, []);
 
   const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
   ) => {
     const { name, value } = e.target;
     setFormData((prev) => ({
@@ -43,6 +45,24 @@ export default function Menu() {
     setLoading(true);
 
     try {
+      let uploadedImageUrl = "";
+
+      // Upload image
+      if (file) {
+        const formDataImg = new FormData();
+        formDataImg.append("image", file);
+
+        const res = await fetch("/api/upload", {
+          method: "POST",
+          body: formDataImg,
+        });
+
+        const data = await res.json();
+        uploadedImageUrl = data.imageUrl;
+        setImageUrl(uploadedImageUrl);
+      }
+
+      // Add menu item
       await addMenu({
         date: formData.date,
         mealType: formData.mealType,
@@ -59,9 +79,10 @@ export default function Menu() {
         date: "",
       });
 
+      setFile(null);
       fetchMenuItems();
     } catch (error) {
-      console.error("Error adding menu item:", error);
+      console.error("Error:", error);
       alert("Error adding menu item");
     } finally {
       setLoading(false);
@@ -82,15 +103,15 @@ export default function Menu() {
 
         <div className="bg-white rounded-xl shadow-sm border border-border/50 p-8">
           <form onSubmit={handleSubmit} className="space-y-8">
+
+            {/* Meal Type */}
             <div>
-              <label className="block text-sm font-semibold text-foreground mb-3">
-                Meal Type
-              </label>
+              <label className="block text-sm font-semibold mb-3">Meal Type</label>
               <select
                 name="mealType"
                 value={formData.mealType}
                 onChange={handleChange}
-                className="w-full px-4 py-3 rounded-lg border border-border bg-white text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 transition"
+                className="w-full px-4 py-3 rounded-lg border"
               >
                 <option value="breakfast">Breakfast</option>
                 <option value="lunch">Lunch</option>
@@ -99,89 +120,88 @@ export default function Menu() {
               </select>
             </div>
 
+            {/* Dish Name */}
             <div>
-              <label className="block text-sm font-semibold text-foreground mb-3">
-                Dish Name
-              </label>
+              <label className="block text-sm font-semibold mb-3">Dish Name</label>
               <input
                 type="text"
                 name="dishName"
                 value={formData.dishName}
                 onChange={handleChange}
-                placeholder="e.g., Biryani, Dosa, Samosa"
-                className="w-full px-4 py-3 rounded-lg border border-border bg-white text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 transition"
+                className="w-full px-4 py-3 rounded-lg border"
                 required
               />
             </div>
 
+            {/* Quantity */}
             <div>
-              <label className="block text-sm font-semibold text-foreground mb-3">
-                Expected Quantity (portions)
-              </label>
+              <label className="block text-sm font-semibold mb-3">Quantity</label>
               <input
                 type="number"
                 name="quantity"
                 value={formData.quantity}
                 onChange={handleChange}
-                placeholder="e.g., 250"
-                className="w-full px-4 py-3 rounded-lg border border-border bg-white text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 transition"
+                className="w-full px-4 py-3 rounded-lg border"
                 required
               />
             </div>
 
+            {/* Date */}
             <div>
-              <label className="block text-sm font-semibold text-foreground mb-3">
-                Date
-              </label>
+              <label className="block text-sm font-semibold mb-3">Date</label>
               <input
                 type="date"
                 name="date"
                 value={formData.date}
                 onChange={handleChange}
-                className="w-full px-4 py-3 rounded-lg border border-border bg-white text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 transition"
+                className="w-full px-4 py-3 rounded-lg border"
                 required
               />
             </div>
 
+            {/* 🔥 Upload Image (FIXED POSITION) */}
+            <div>
+              <label className="block text-sm font-semibold mb-3">
+                Upload Image
+              </label>
+              <input
+                type="file"
+                accept="image/*"
+                onChange={(e) => {
+                  if (e.target.files && e.target.files[0]) {
+                    setFile(e.target.files[0]);
+                  }
+                }}
+              />
+            </div>
+
+            {/* Submit */}
             <button
               type="submit"
               disabled={loading}
-              className="w-full px-6 py-4 bg-gradient-to-r from-primary to-primary/80 text-white font-semibold rounded-xl hover:shadow-lg transition-all transform hover:scale-105 flex items-center justify-center gap-2 text-lg disabled:opacity-60 disabled:cursor-not-allowed"
+              className="w-full py-3 bg-blue-500 text-white rounded-lg"
             >
-              <Save className="w-5 h-5" />
               {loading ? "Adding..." : "Add Menu Item"}
             </button>
           </form>
+
+          {/* Show Image */}
+          {imageUrl && (
+            <div className="mt-4">
+              <img src={imageUrl} className="w-40 rounded-lg" />
+            </div>
+          )}
         </div>
 
-        <div className="mt-12 bg-white rounded-xl shadow-sm border border-border/50 p-8">
-          <h2 className="text-2xl font-bold text-foreground mb-6">Recent Menu Items</h2>
+        {/* Menu List */}
+        <div className="mt-12 bg-white rounded-xl p-8">
+          <h2 className="text-2xl font-bold mb-6">Recent Menu Items</h2>
 
-          <div className="space-y-4">
-            {menuItems.length === 0 ? (
-              <p className="text-muted-foreground">No menu items found.</p>
-            ) : (
-              menuItems.map((item) => (
-                <div
-                  key={item.Id}
-                  className="flex items-center justify-between p-4 rounded-lg bg-muted/30 border border-border/30"
-                >
-                  <div>
-                    <p className="font-semibold text-foreground">{item.DishName}</p>
-                    <p className="text-sm text-muted-foreground">
-                      {item.MealType} • {item.MealDate}
-                    </p>
-                  </div>
-                  <div className="text-right">
-                    <p className="font-bold text-primary">
-                      {item.QuantityPrepared}
-                    </p>
-                    <p className="text-xs text-muted-foreground">portions</p>
-                  </div>
-                </div>
-              ))
-            )}
-          </div>
+          {menuItems.map((item) => (
+            <div key={item.Id} className="p-3 border mb-2 rounded">
+              {item.DishName} ({item.QuantityPrepared})
+            </div>
+          ))}
         </div>
       </main>
     </div>

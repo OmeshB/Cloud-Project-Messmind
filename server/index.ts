@@ -6,6 +6,7 @@ import { getMenu, addMenu } from "./routes/menu";
 import { getFeedback, addFeedback } from "./routes/feedback";
 import { getDashboard } from "./routes/dashboard";
 import { getPrediction } from "./routes/prediction";
+import uploadRouter from "./routes/upload";
 
 export function createServer() {
   const app = express();
@@ -13,6 +14,7 @@ export function createServer() {
   app.use(cors());
   app.use(express.json());
   app.use(express.urlencoded({ extended: true }));
+  app.use("/api/upload", uploadRouter);
 
   app.get("/api/ping", (_req, res) => {
     const ping = process.env.PING_MESSAGE ?? "ping";

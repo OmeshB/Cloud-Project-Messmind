@@ -16,9 +16,14 @@ const dbConfig: sql.config = {
 let pool: sql.ConnectionPool | null = null;
 
 export async function getDbPool() {
-  if (pool) return pool;
+  try {
+    if (pool) return pool;
 
-  pool = await sql.connect(dbConfig);
-  console.log("Connected to Azure SQL Database");
-  return pool;
+    pool = await sql.connect(dbConfig);
+    console.log("Connected to Azure SQL Database");
+    return pool;
+  } catch (err) {
+    console.error("DB CONNECTION ERROR:", err);
+    return null; // don't crash app
+  }
 }
