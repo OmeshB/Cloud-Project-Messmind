@@ -1,46 +1,40 @@
 {
   "compilerOptions": {
-    "target": "ES2020",
+    "target": "ESNext",
     "useDefineForClassFields": true,
-    "lib": ["ES2020", "DOM", "DOM.Iterable"],
+    "lib": ["ESNext", "DOM", "DOM.Iterable"],
     "module": "ESNext",
     "skipLibCheck": true,
 
-    /* FIXED */
-    "moduleResolution": "node",
-
+    "moduleResolution": "Bundler",
     "allowImportingTsExtensions": true,
+    "resolveJsonModule": true,
     "isolatedModules": true,
-    "moduleDetection": "force",
     "noEmit": true,
     "jsx": "react-jsx",
+
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
     "forceConsistentCasingInFileNames": true,
-
-    /* Linting */
     "strict": false,
-    "noUnusedLocals": false,
-    "noUnusedParameters": false,
-    "noImplicitAny": false,
-    "noFallthroughCasesInSwitch": false,
-    "strictNullChecks": false,
+    "skipDefaultLibCheck": true,
 
-    /* Path mapping */
     "baseUrl": ".",
     "paths": {
       "@/*": ["client/*"],
       "@shared/*": ["shared/*"]
     },
 
-    /* Vite */
-    "types": ["vite/client"]
-  },
+    "types": ["vite/client", "node"],
 
+    /* ✅ FIX */
+    "ignoreDeprecations": "6.0"
+  },
   "include": [
-    "client/**/*",
-    "server/**/*",
-    "shared/**/*",
+    "client/**/*.ts",
+    "client/**/*.tsx",
+    "server/**/*.ts",
+    "shared/**/*.ts",
     "vite.config.ts",
     "vite.config.server.ts"
   ],

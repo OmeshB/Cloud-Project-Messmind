@@ -19,12 +19,9 @@ jobs:
       contents: read
 
     steps:
-      - uses: actions/checkout@v3
-        with:
-          submodules: true
-          lfs: false
+      - name: Checkout
+        uses: actions/checkout@v3
 
-      # 🔐 Azure Login (FIXED)
       - name: Azure Login
         uses: azure/login@v1
         with:
@@ -36,36 +33,28 @@ jobs:
               "tenantId": "${{ secrets.AZURE_TENANT_ID }}"
             }
 
-      # 🌍 Terraform Setup
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v2
 
-      # ⚙️ Terraform Init
-      - name: Terraform Init
-        run: terraform init
+      - name: Terraform Init & Apply
         working-directory: ./Frontend/infra
+        run: |
+          terraform init
+          terraform apply -auto-approve
 
-      # 🚀 Terraform Apply
-      - name: Terraform Apply
-        run: terraform apply -auto-approve
-        working-directory: ./Frontend/infra
-
-      # 🚀 SWA Deploy (cleaned)
+      # 🔥 IMPORTANT FIX HERE
       - name: Build And Deploy
         uses: Azure/static-web-apps-deploy@v1
         with:
           azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN_VICTORIOUS_GROUND_093BA9C00 }}
-          action: "upload"
-          app_location: "/"
-          api_location: ""
+          action: upload
+          app_location: "./Frontend"   # ✅ FIXED
           output_location: "dist/spa"
 
   close_pull_request_job:
     if: github.event_name == 'pull_request' && github.event.action == 'closed'
     runs-on: ubuntu-latest
-    name: Close Pull Request Job
     steps:
-      - name: Close Pull Request
-        uses: Azure/static-web-apps-deploy@v1
+      - uses: Azure/static-web-apps-deploy@v1
         with:
-          action: "close"
+          action: close
