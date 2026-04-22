@@ -6,12 +6,12 @@
     "module": "ESNext",
     "skipLibCheck": true,
 
-    /* Bundler mode */
+    /* FIXED */
     "moduleResolution": "node",
+
     "allowImportingTsExtensions": true,
     "isolatedModules": true,
     "moduleDetection": "force",
-
     "noEmit": true,
     "jsx": "react-jsx",
     "esModuleInterop": true,
@@ -29,10 +29,14 @@
     /* Path mapping */
     "baseUrl": ".",
     "paths": {
-      "@/*": ["./client/*"],
-      "@shared/*": ["./shared/*"]
-    }
+      "@/*": ["client/*"],
+      "@shared/*": ["shared/*"]
+    },
+
+    /* Vite */
+    "types": ["vite/client"]
   },
+
   "include": [
     "client/**/*",
     "server/**/*",
