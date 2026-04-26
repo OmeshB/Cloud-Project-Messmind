@@ -14,19 +14,17 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
 
-      # 🔍 Debug (optional but useful)
+      # 🔍 Debug (optional)
       - name: Show folder structure
         run: ls -R
 
-      # ✅ Install deps (ROOT LEVEL)
+      # ✅ Install (ROOT LEVEL)
       - name: Install dependencies
         run: npm install
-        working-directory: ./Frontend
 
-      # ✅ Build
+      # ✅ Build (ROOT LEVEL)
       - name: Build app
         run: npm run build
-        working-directory: ./Frontend
 
       # 🚀 Deploy
       - name: Deploy to Azure Static Web Apps
@@ -34,5 +32,5 @@ jobs:
         with:
           azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN_VICTORIOUS_GROUND_093BA9C00 }}
           action: "upload"
-          app_location: "Frontend"
+          app_location: "/"          # ✅ ROOT
           output_location: "dist/spa"
