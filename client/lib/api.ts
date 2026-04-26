@@ -1,11 +1,9 @@
 // 🔥 FIX: Add your deployed backend URL as fallback
-const API_BASE_URL =
-  import.meta.env.VITE_API_BASE_URL ||
-  "https://messmind-app-cqb9gkagg7exgrcf.centralindia-01.azurewebsites.net";
+const API_BASE_URL = "https://messmind-app-cqb9gkagg7exgrcf.centralindia-01.azurewebsites.net";
 
 // 🔧 Generic API handler
 async function apiRequest<T>(
-  endpoint: string,
+  endpoint: string, 
   options?: RequestInit
 ): Promise<T> {
   const response = await fetch(`${API_BASE_URL}${endpoint}`, {
