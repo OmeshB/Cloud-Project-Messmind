@@ -23,6 +23,7 @@ export type PredictionData = {
   topDish: string;
   lowDemandDishes: { dish: string; quantity: number }[];
   suggestion: string;
+  aiInsight: string; 
 };
 
 export type MenuItem = {

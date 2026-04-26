@@ -1,5 +1,10 @@
 import { useEffect, useState } from "react";
-import { TrendingUp, AlertTriangle, CheckCircle } from "lucide-react";
+import {
+  TrendingUp,
+  AlertTriangle,
+  CheckCircle,
+  Sparkles,
+} from "lucide-react";
 import Navbar from "@/components/Navbar";
 import type { PredictionData } from "../lib/api";
 import { getPrediction } from "../lib/api";
@@ -7,6 +12,10 @@ import { getPrediction } from "../lib/api";
 export default function Prediction() {
   const [data, setData] = useState<PredictionData | null>(null);
   const [loading, setLoading] = useState(true);
+
+  // 🔥 NEW STATES
+  const [aiInsight, setAiInsight] = useState<string>("");
+  const [aiLoading, setAiLoading] = useState(false);
 
   useEffect(() => {
     const fetchPrediction = async () => {
@@ -23,6 +32,31 @@ export default function Prediction() {
     fetchPrediction();
   }, []);
 
+  // 🔥 BUTTON CLICK FUNCTION
+  const generateAIInsight = async () => {
+    if (!data) return;
+
+    try {
+      setAiLoading(true);
+
+      const res = await fetch("/api/prediction/ai-insight", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(data),
+      });
+
+      const json = await res.json();
+      setAiInsight(json.insight || "No insight generated");
+    } catch (err) {
+      console.error("AI Insight error:", err);
+      setAiInsight("Error generating AI insight");
+    } finally {
+      setAiLoading(false);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-white to-muted/20">
       <Navbar />
@@ -30,16 +64,16 @@ export default function Prediction() {
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div className="mb-12">
           <h1 className="text-4xl font-bold text-foreground mb-2">
-            NutriCast Prediction
+            🍽️ Nutricast AI
           </h1>
           <p className="text-muted-foreground text-lg">
-            AI-powered meal demand insights
+            Smart meal demand predictions powered by AI
           </p>
         </div>
 
         {loading && (
           <div className="mb-8 p-4 rounded-lg bg-blue-50 border border-blue-200 text-blue-800">
-            Loading prediction data...
+            Loading Nutricast AI insights...
           </div>
         )}
 
@@ -51,6 +85,7 @@ export default function Prediction() {
 
         {data && (
           <>
+            {/* TOP CARDS */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-8">
               <div className="bg-white rounded-xl p-8 border shadow-sm">
                 <div className="flex justify-between mb-4">
@@ -97,9 +132,10 @@ export default function Prediction() {
               </div>
             </div>
 
-            <div className="bg-white rounded-xl p-8 border shadow-sm">
+            {/* BASIC SUGGESTION */}
+            <div className="bg-white rounded-xl p-8 border shadow-sm mb-8">
               <h2 className="text-2xl font-bold mb-4">
-                NutriCast Recommendation
+                Nutricast Recommendation
               </h2>
 
               <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg">
@@ -108,6 +144,35 @@ export default function Prediction() {
                 </p>
               </div>
             </div>
+
+            {/* 🔥 AI BUTTON */}
+            <div className="mb-6">
+              <button
+                onClick={generateAIInsight}
+                className="px-6 py-3 bg-purple-600 text-white rounded-lg shadow hover:bg-purple-700 transition"
+                disabled={aiLoading}
+              >
+                {aiLoading ? "Generating AI Insight..." : "✨ Generate AI Insight"}
+              </button>
+            </div>
+
+            {/* 🔥 AI INSIGHT SECTION */}
+            {aiInsight && (
+              <div className="bg-white rounded-xl p-8 border shadow-sm">
+                <div className="flex items-center gap-2 mb-4">
+                  <Sparkles className="text-purple-500" />
+                  <h2 className="text-2xl font-bold">
+                    Nutricast AI Insight
+                  </h2>
+                </div>
+
+                <div className="p-4 bg-purple-50 border border-purple-200 rounded-lg">
+                  <p className="text-purple-900 leading-relaxed">
+                    {aiInsight}
+                  </p>
+                </div>
+              </div>
+            )}
           </>
         )}
       </main>

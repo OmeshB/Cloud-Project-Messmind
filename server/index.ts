@@ -1,11 +1,12 @@
 import "dotenv/config";
 import express from "express";
 import cors from "cors";
+
 import { handleDemo } from "./routes/demo";
 import { getMenu, addMenu } from "./routes/menu";
 import { getFeedback, addFeedback } from "./routes/feedback";
 import { getDashboard } from "./routes/dashboard";
-import { getPrediction } from "./routes/prediction";
+import predictionRoutes from "./routes/prediction";
 import uploadRouter from "./routes/upload";
 
 export function createServer() {
@@ -14,11 +15,11 @@ export function createServer() {
   app.use(cors());
   app.use(express.json());
   app.use(express.urlencoded({ extended: true }));
+
   app.use("/api/upload", uploadRouter);
 
   app.get("/api/ping", (_req, res) => {
-    const ping = process.env.PING_MESSAGE ?? "ping";
-    res.json({ message: ping });
+    res.json({ message: "ping" });
   });
 
   app.get("/api/demo", handleDemo);
@@ -31,7 +32,17 @@ export function createServer() {
 
   app.get("/api/dashboard", getDashboard);
 
-  app.get("/api/prediction", getPrediction);
+  // 🔥 Prediction routes
+  app.use("/api/prediction", predictionRoutes);
 
   return app;
 }
+
+// 🚀 START SERVER
+const app = createServer();
+
+const PORT = 5000;
+
+app.listen(PORT, () => {
+  console.log(`🚀 Server running on http://localhost:${PORT}`);
+});

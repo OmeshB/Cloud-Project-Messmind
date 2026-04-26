@@ -22,10 +22,14 @@
   },
   "dependencies": {
     "@azure/storage-blob": "^12.31.0",
+    "@google/generative-ai": "^0.24.1",
+    "axios": "^1.15.2",
     "dotenv": "^17.2.1",
     "express": "^5.1.0",
+    "groq-sdk": "^1.1.2",
     "mssql": "^12.2.1",
     "multer": "^2.1.1",
+    "ts-node": "^10.9.2",
     "zod": "^3.25.76"
   },
   "devDependencies": {
@@ -65,7 +69,7 @@
     "@types/cors": "^2.8.19",
     "@types/express": "^5.0.3",
     "@types/multer": "^2.1.0",
-    "@types/node": "^24.2.1",
+    "@types/node": "^24.12.2",
     "@types/react": "^18.3.23",
     "@types/react-dom": "^18.3.7",
     "@types/three": "^0.176.0",
@@ -98,7 +102,7 @@
     "tailwindcss-animate": "^1.0.7",
     "three": "^0.176.0",
     "tsx": "^4.20.3",
-    "typescript": "^5.3.3",
+    "typescript": "^5.9.3",
     "vaul": "^1.1.2",
     "vite": "^7.1.2",
     "vitest": "^3.2.4"

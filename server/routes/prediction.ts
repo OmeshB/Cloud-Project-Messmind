@@ -1,61 +1,48 @@
-import { RequestHandler } from "express";
-import { getDbPool } from "../database";
+import express from "express";
+import { getAIInsight } from "../services/aiService";
+import { moderateText } from "../services/moderationService";
+import { getMenuFromDB } from "../services/menuService";
 
-export const getPrediction: RequestHandler = async (_req, res) => {
+const router = express.Router();
+
+// ✅ MAIN GET ROUTE
+router.get("/", async (_req, res) => {
   try {
-    const pool = await getDbPool();
+    const menuItems = await getMenuFromDB();
 
-    const menuResult = await pool.request().query(`
-      SELECT * FROM MenuItems
-    `);
-
-    const menuItems = menuResult.recordset;
-
-    if (menuItems.length === 0) {
+    if (!menuItems.length) {
       return res.status(200).json({
         predictedDemand: 0,
         topDish: "No data",
         lowDemandDishes: [],
-        suggestion: "Add menu data to generate NutriCast predictions.",
+        suggestion: "No menu data available",
       });
     }
 
     const totalPrepared = menuItems.reduce(
-      (sum: number, item: any) => sum + Number(item.QuantityPrepared || 0),
+      (sum, item) => sum + Number(item.QuantityPrepared || 0),
       0
     );
 
     const averageDemand = Math.round(totalPrepared / menuItems.length);
 
-    const dishMap: Record<string, number> = {};
+    // 🔥 Find top dish dynamically
+    const topItem = menuItems.reduce((prev, curr) =>
+      curr.QuantityPrepared > prev.QuantityPrepared ? curr : prev
+    );
 
-    menuItems.forEach((item: any) => {
-      dishMap[item.DishName] =
-        (dishMap[item.DishName] || 0) + Number(item.QuantityPrepared || 0);
-    });
+    const topDish = topItem.DishName;
 
-    let topDish = "No data";
-    let maxQty = 0;
+    // 🔥 Find low demand dish
+    const lowItem = menuItems.reduce((prev, curr) =>
+      curr.QuantityPrepared < prev.QuantityPrepared ? curr : prev
+    );
 
-    Object.entries(dishMap).forEach(([dish, qty]) => {
-      if (Number(qty) > maxQty) {
-        maxQty = Number(qty);
-        topDish = dish;
-      }
-    });
+    const lowDemandDishes = [
+      { dish: lowItem.DishName, quantity: lowItem.QuantityPrepared },
+    ];
 
-    const lowDemandDishes = Object.entries(dishMap)
-      .filter(([, qty]) => Number(qty) < averageDemand)
-      .map(([dish, qty]) => ({
-        dish,
-        quantity: qty,
-      }));
-
-    let suggestion = `Prepare around ${averageDemand} portions based on current trend.`;
-
-    if (lowDemandDishes.length > 0) {
-      suggestion = `Reduce preparation for ${lowDemandDishes[0].dish} and focus more on ${topDish}.`;
-    }
+    const suggestion = `Prepare around ${averageDemand} portions. Focus more on ${topDish}.`;
 
     res.status(200).json({
       predictedDemand: averageDemand,
@@ -70,4 +57,41 @@ export const getPrediction: RequestHandler = async (_req, res) => {
       error: err instanceof Error ? err.message : String(err),
     });
   }
-};
+});
+
+// 🔥 AI ROUTE
+router.post("/ai-insight", async (req, res) => {
+  try {
+    const data = req.body;
+
+    const rawInsight = await getAIInsight(data);
+
+    const moderation = await moderateText(rawInsight);
+
+    console.log("MODERATION RESULT:", moderation);
+    console.log("AI USED:", rawInsight);
+
+    let finalInsight = rawInsight;
+
+    if (moderation?.categoriesAnalysis) {
+      const isUnsafe = moderation.categoriesAnalysis.some(
+        (c: any) => c.severity >= 3
+      );
+
+      if (isUnsafe) {
+        finalInsight =
+          "⚠️ AI insight was filtered due to safety concerns.";
+      }
+    }
+
+    res.json({ insight: finalInsight });
+  } catch (err) {
+    console.error("AI Insight error:", err);
+    res.status(500).json({
+      message: "Error generating AI insight",
+      error: err instanceof Error ? err.message : String(err),
+    });
+  }
+});
+
+export default router;

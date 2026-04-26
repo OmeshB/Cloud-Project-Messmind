@@ -2,27 +2,32 @@ import { useEffect, useState } from "react";
 import { TrendingUp, AlertCircle, Users, Utensils, Star } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import type { DashboardData, FeedbackItem, MenuItem } from "../lib/api";
-import { getDashboard, getFeedback, getMenu } from "../lib/api";
+import { getDashboard, getFeedback, getMenu, getPrediction } from "../lib/api";
 
 export default function Dashboard() {
   const [dashboardData, setDashboardData] = useState<DashboardData | null>(null);
   const [menuItems, setMenuItems] = useState<MenuItem[]>([]);
   const [feedbackItems, setFeedbackItems] = useState<FeedbackItem[]>([]);
+  const [aiInsight, setAiInsight] = useState<string>(""); // ✅ NEW
   const [loading, setLoading] = useState(true);
 
   const fetchDashboardData = async () => {
     try {
       setLoading(true);
 
-      const [dashboardJson, menuJson, feedbackJson] = await Promise.all([
+      const [dashboardJson, menuJson, feedbackJson, predictionJson] = await Promise.all([
         getDashboard(),
         getMenu(),
         getFeedback(),
+        getPrediction(), // ✅ NEW
       ]);
 
       setDashboardData(dashboardJson);
       setMenuItems(Array.isArray(menuJson) ? menuJson : []);
       setFeedbackItems(Array.isArray(feedbackJson) ? feedbackJson : []);
+
+      // ✅ AI Insight set
+      setAiInsight(predictionJson.aiInsight || "");
     } catch (error) {
       console.error("Error loading dashboard data:", error);
     } finally {
@@ -73,6 +78,7 @@ export default function Dashboard() {
         )}
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+          {/* cards unchanged */}
           <div className="bg-white rounded-xl shadow-sm border border-border/50 p-6 hover:shadow-md transition">
             <div className="flex items-center justify-between">
               <div>
@@ -148,41 +154,7 @@ export default function Dashboard() {
           </div>
         </div>
 
-        <div className="bg-white rounded-xl shadow-sm border border-border/50 p-8 mb-8">
-          <h2 className="text-2xl font-bold text-foreground mb-6">Recent Menu Items</h2>
-
-          <div className="space-y-4">
-            {recentMenuItems.length === 0 ? (
-              <p className="text-muted-foreground">No menu data available yet.</p>
-            ) : (
-              recentMenuItems.map((item) => (
-                <div
-                  key={item.Id}
-                  className="flex items-center justify-between p-4 rounded-lg bg-muted/30 border border-border/30 hover:bg-muted/50 transition"
-                >
-                  <div>
-                    <p className="font-semibold text-foreground text-lg capitalize">
-                      {item.MealType}
-                    </p>
-                    <p className="text-muted-foreground text-sm mt-1">
-                      {item.DishName}
-                    </p>
-                    <p className="text-xs text-muted-foreground mt-1">
-                      {item.MealDate.split("T")[0]}
-                    </p>
-                  </div>
-                  <div className="text-right">
-                    <p className="text-2xl font-bold text-primary">
-                      {item.QuantityPrepared}
-                    </p>
-                    <p className="text-xs text-muted-foreground">portions</p>
-                  </div>
-                </div>
-              ))
-            )}
-          </div>
-        </div>
-
+        {/* 🔥 UPDATED ALERT SECTION */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           <div className="bg-white rounded-xl shadow-sm border border-border/50 p-8">
             <h2 className="text-2xl font-bold text-foreground mb-6">
@@ -190,6 +162,22 @@ export default function Dashboard() {
             </h2>
 
             <div className="space-y-4">
+              {/* ✅ AI Insight FIRST */}
+              {aiInsight && (
+                <div className="flex items-start gap-4 p-4 rounded-lg bg-purple-50 border border-purple-200">
+                  <TrendingUp className="w-5 h-5 text-purple-600 flex-shrink-0 mt-0.5" />
+                  <div>
+                    <p className="font-semibold text-purple-900">
+                      NutriCast AI Insight
+                    </p>
+                    <p className="text-purple-800 text-sm mt-1 whitespace-pre-line">
+                      {aiInsight}
+                    </p>
+                  </div>
+                </div>
+              )}
+
+              {/* EXISTING ALERTS */}
               {!dashboardData?.alerts || dashboardData.alerts.length === 0 ? (
                 <div className="flex items-start gap-4 p-4 rounded-lg bg-green-50 border border-green-200">
                   <TrendingUp className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
@@ -221,6 +209,7 @@ export default function Dashboard() {
             </div>
           </div>
 
+          {/* FEEDBACK SNAPSHOT (unchanged) */}
           <div className="bg-white rounded-xl shadow-sm border border-border/50 p-8">
             <h2 className="text-2xl font-bold text-foreground mb-6">
               Feedback Snapshot
