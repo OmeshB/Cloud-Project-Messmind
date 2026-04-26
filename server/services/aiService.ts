@@ -1,19 +1,13 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import Groq from "groq-sdk";
 
-const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY!);
-
-const groq = new Groq({
-  apiKey: process.env.GROQ_API_KEY!,
-});
-
 function cleanText(text: string) {
   return text
-    .replace(/\*\*/g, "")        // remove **
-    .replace(/\*/g, "")          // remove *
-    .replace(/\\n/g, " ")        // remove \n
-    .replace(/\n/g, " ")         // remove real new lines
-    .replace(/\s+/g, " ")        // remove extra spaces
+    .replace(/\*\*/g, "")
+    .replace(/\*/g, "")
+    .replace(/\\n/g, " ")
+    .replace(/\n/g, " ")
+    .replace(/\s+/g, " ")
     .trim();
 }
 
@@ -28,8 +22,14 @@ Give clean, simple output WITHOUT markdown, stars (*), or formatting symbols.
 Use plain sentences only.
 `;
 
-  // 🔥 TRY GEMINI
+  // 🔥 TRY GEMINI (initialize inside function)
   try {
+    if (!process.env.GEMINI_API_KEY) {
+      throw new Error("No Gemini API key");
+    }
+
+    const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
+
     const model = genAI.getGenerativeModel({
       model: "gemini-2.5-flash",
     });
@@ -46,8 +46,16 @@ Use plain sentences only.
     console.error("⚠️ Gemini failed, switching to Groq...");
   }
 
-  // 🔥 FALLBACK GROQ
+  // 🔥 FALLBACK GROQ (initialize inside function)
   try {
+    if (!process.env.GROQ_API_KEY) {
+      throw new Error("No Groq API key");
+    }
+
+    const groq = new Groq({
+      apiKey: process.env.GROQ_API_KEY,
+    });
+
     const response = await groq.chat.completions.create({
       model: "llama3-70b-8192",
       messages: [
@@ -66,6 +74,8 @@ Use plain sentences only.
 
   } catch (error) {
     console.error("❌ Both Gemini and Groq failed:", error);
-    return "AI insight unavailable due to service issues.";
+
+    // ✅ IMPORTANT: fallback so build/test NEVER fails
+    return "AI insight temporarily unavailable";
   }
 }
