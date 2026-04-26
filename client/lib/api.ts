@@ -1,6 +1,13 @@
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "";
+// 🔥 FIX: Add your deployed backend URL as fallback
+const API_BASE_URL =
+  import.meta.env.VITE_API_BASE_URL ||
+  "https://messmind-app-cqb9gkagg7exgrcf.centralindia-01.azurewebsites.net";
 
-async function apiRequest<T>(endpoint: string, options?: RequestInit): Promise<T> {
+// 🔧 Generic API handler
+async function apiRequest<T>(
+  endpoint: string,
+  options?: RequestInit
+): Promise<T> {
   const response = await fetch(`${API_BASE_URL}${endpoint}`, {
     headers: {
       "Content-Type": "application/json",
@@ -18,12 +25,13 @@ async function apiRequest<T>(endpoint: string, options?: RequestInit): Promise<T
   return data;
 }
 
+// 📊 TYPES
 export type PredictionData = {
   predictedDemand: number;
   topDish: string;
   lowDemandDishes: { dish: string; quantity: number }[];
   suggestion: string;
-  aiInsight: string; 
+  aiInsight?: string;
 };
 
 export type MenuItem = {
@@ -31,7 +39,7 @@ export type MenuItem = {
   MealDate: string;
   MealType: string;
   DishName: string;
-  imageUrl?: string;  
+  imageUrl?: string;
   QuantityPrepared: number;
 };
 
@@ -52,6 +60,8 @@ export type DashboardData = {
   alerts: string[];
 };
 
+// ✅ API CALLS
+
 export async function getPrediction() {
   return apiRequest<PredictionData>("/api/prediction");
 }
@@ -65,7 +75,7 @@ export async function addMenu(payload: {
   mealType: string;
   dishName: string;
   quantityPrepared: string;
-  imageUrl?: string;   // ✅ ADD THIS
+  imageUrl?: string;
 }) {
   return apiRequest("/api/menu", {
     method: "POST",
@@ -91,4 +101,12 @@ export async function addFeedback(payload: {
 
 export async function getDashboard() {
   return apiRequest<DashboardData>("/api/dashboard");
+}
+
+// 🔥 NEW: AI INSIGHT CALL (YOU WERE MISSING THIS)
+export async function getAIInsight(data: any) {
+  return apiRequest<{ insight: string }>("/api/prediction/ai-insight", {
+    method: "POST",
+    body: JSON.stringify(data),
+  });
 }
