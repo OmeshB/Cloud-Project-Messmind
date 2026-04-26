@@ -13,7 +13,7 @@ jobs:
   build_and_deploy_job:
     if: github.event_name == 'push' || (github.event_name == 'pull_request' && github.event.action != 'closed')
     runs-on: ubuntu-latest
-    name: Build, Terraform and Deploy
+    name: Build and Deploy
     permissions:
       id-token: write
       contents: read
@@ -22,25 +22,23 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
 
-      - name: Azure Login
-        uses: azure/login@v1
-        with:
-          creds: |
-            {
-              "clientId": "${{ secrets.AZURE_CLIENT_ID }}",
-              "clientSecret": "${{ secrets.AZURE_CLIENT_SECRET }}",
-              "subscriptionId": "${{ secrets.AZURE_SUBSCRIPTION_ID }}",
-              "tenantId": "${{ secrets.AZURE_TENANT_ID }}"
-            }
-
-      - name: Setup Terraform
-        uses: hashicorp/setup-terraform@v2
-
+      # 🔥 IMPORTANT: Build inside Frontend folder
       - name: Install dependencies
+        working-directory: ./Frontend
         run: npm install
 
       - name: Build app
+        working-directory: ./Frontend
         run: npm run build
+
+      # 🚀 THIS WAS MISSING (DEPLOY STEP)
+      - name: Deploy to Azure Static Web Apps
+        uses: Azure/static-web-apps-deploy@v1
+        with:
+          azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN_VICTORIOUS_GROUND_093BA9C00 }}
+          action: "upload"
+          app_location: "Frontend"
+          output_location: "dist/spa"
 
   close_pull_request_job:
     if: github.event_name == 'pull_request' && github.event.action == 'closed'
@@ -51,4 +49,4 @@ jobs:
         with:
           azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN_VICTORIOUS_GROUND_093BA9C00 }}
           action: close
-          app_location: "./Frontend"
+          app_location: "Frontend"
