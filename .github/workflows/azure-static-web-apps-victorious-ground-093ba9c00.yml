@@ -1,18 +1,43 @@
-name: Azure Static Web Apps CI/CD
+name: Azure Static Web Apps CI/CD + Terraform
 
 on:
   push:
     branches:
       - main
+  pull_request:
+    types: [opened, synchronize, reopened, closed]
+    branches:
+      - main
 
 jobs:
   build_and_deploy_job:
+    if: github.event_name == 'push' || (github.event_name == 'pull_request' && github.event.action != 'closed')
     runs-on: ubuntu-latest
-    name: Build and Deploy
+    name: Build, Terraform and Deploy
+    permissions:
+      id-token: write
+      contents: read
 
     steps:
       - name: Checkout
         uses: actions/checkout@v3
+
+      - name: Azure Login
+        uses: azure/login@v1
+        with:
+          creds: |
+            {
+              "clientId": "${{ secrets.AZURE_CLIENT_ID }}",
+              "clientSecret": "${{ secrets.AZURE_CLIENT_SECRET }}",
+              "subscriptionId": "${{ secrets.AZURE_SUBSCRIPTION_ID }}",
+              "tenantId": "${{ secrets.AZURE_TENANT_ID }}"
+            }
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v2
+
+      # Note: You'll typically want terraform init/apply here 
+      # to ensure the infrastructure exists before deploying code.
 
       - name: Install dependencies
         run: npm install
@@ -20,15 +45,23 @@ jobs:
       - name: Build app
         run: npm run build
 
-      # 🔍 DEBUG (optional - remove later)
-      - name: Show files
-        run: ls -R
-
-      - name: Deploy to Azure Static Web Apps
+      - name: Build And Deploy
+        id: builddeploy
         uses: Azure/static-web-apps-deploy@v1
         with:
           azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN_VICTORIOUS_GROUND_093BA9C00 }}
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
           action: "upload"
-          app_location: "."          # ✅ FIXED
-          output_location: "dist/spa"  # ✅ keep this if correct
-          skip_app_build: true
+          app_location: "./Frontend" # Ensure this matches your project structure
+          output_location: "build"    # Usually 'build' or 'dist'
+
+  close_pull_request_job:
+    if: github.event_name == 'pull_request' && github.event.action == 'closed'
+    runs-on: ubuntu-latest
+    name: Close Pull Request
+    steps:
+      - name: Close Pull Request
+        uses: Azure/static-web-apps-deploy@v1
+        with:
+          azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN_VICTORIOUS_GROUND_093BA9C00 }}
+          action: "close"
