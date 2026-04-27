@@ -25,16 +25,13 @@ jobs:
           submodules: true
           lfs: false
 
-      - name: Install OIDC Client
-        run: npm install @actions/core@1.6.0 @actions/http-client
-
+       # FIXED TOKEN STEP
       - name: Get Id Token
         uses: actions/github-script@v6
         id: idtoken
         with:
           script: |
-            const core = require('@actions/core');
-            return await core.getIDToken();
+            return await core.getIDToken()
           result-encoding: string
 
       - name: Build And Deploy
@@ -60,3 +57,4 @@ jobs:
         with:
           azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN }}
           action: "close"
+          app_location: "/"   # ✅ IMPORTANT
