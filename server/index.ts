@@ -16,7 +16,8 @@ export function createServer() {
   app.use(express.json());
   app.use(express.urlencoded({ extended: true }));
 
-  app.use("/api/upload", uploadRouter);
+  // ✅ FIX: cleaner route handling
+  app.use("/api", uploadRouter);
 
   app.get("/api/ping", (_req, res) => {
     res.json({ message: "ping" });
@@ -32,17 +33,14 @@ export function createServer() {
 
   app.get("/api/dashboard", getDashboard);
 
-  // 🔥 Prediction routes
   app.use("/api/prediction", predictionRoutes);
 
   return app;
 }
 
-// 🚀 START SERVER
 const app = createServer();
-
-const PORT = 5000;
+const PORT = process.env.PORT || 5000;
 
 app.listen(PORT, () => {
-  console.log(`🚀 Server running on http://localhost:${PORT}`);
+  console.log(`🚀 Server running on port ${PORT}`);
 });

@@ -8,9 +8,10 @@ const upload = multer({
   storage: multer.memoryStorage(),
 });
 
-router.post("/", upload.single("image"), async (req, res) => {
+// ✅ FIX: use /upload explicitly
+router.post("/upload", upload.single("image"), async (req, res) => {
   try {
-    const file = req.file as Express.Multer.File; // ✅ fix
+    const file = req.file as Express.Multer.File;
 
     if (!file) {
       return res.status(400).json({ error: "No file uploaded" });

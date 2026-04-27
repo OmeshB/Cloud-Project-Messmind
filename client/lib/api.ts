@@ -1,9 +1,8 @@
-// 🔥 FIX: Add your deployed backend URL as fallback
-const API_BASE_URL = "https://messmind-app-cqb9gkagg7exgrcf.centralindia-01.azurewebsites.net";
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "";
 
 // 🔧 Generic API handler
 async function apiRequest<T>(
-  endpoint: string, 
+  endpoint: string,
   options?: RequestInit
 ): Promise<T> {
   const response = await fetch(`${API_BASE_URL}${endpoint}`, {
@@ -101,7 +100,7 @@ export async function getDashboard() {
   return apiRequest<DashboardData>("/api/dashboard");
 }
 
-// 🔥 NEW: AI INSIGHT CALL (YOU WERE MISSING THIS)
+// 🔥 AI INSIGHT
 export async function getAIInsight(data: any) {
   return apiRequest<{ insight: string }>("/api/prediction/ai-insight", {
     method: "POST",
