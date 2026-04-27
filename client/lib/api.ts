@@ -1,12 +1,10 @@
-const API_BASE_URL =
-  import.meta.env.VITE_API_BASE_URL ||
-  "https://messmind-app-cqb9gkagg7exgrcf.centralindia-01.azurewebsites.net";
-
+const API_BASE_URL =  import.meta.env.VITE_API_BASE_URL ??   "https://messmind-app-cqb9gkagg7exgrcf.centralindia-01.azurewebsites.net";
+console.log("API BASE URL:", API_BASE_URL);
 // 🔧 Generic API handler
 async function apiRequest<T>(
   endpoint: string,
   options?: RequestInit
-): Promise<T> {
+): Promise<T> { 
   const response = await fetch(`${API_BASE_URL}${endpoint}`, {
     headers: {
       "Content-Type": "application/json",
