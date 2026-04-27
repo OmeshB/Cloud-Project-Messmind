@@ -1,4 +1,6 @@
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "";
+const API_BASE_URL =
+  import.meta.env.VITE_API_BASE_URL ||
+  "https://messmind-app-cqb9gkagg7exgrcf.centralindia-01.azurewebsites.net";
 
 // 🔧 Generic API handler
 async function apiRequest<T>(
