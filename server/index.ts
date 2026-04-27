@@ -12,7 +12,11 @@ import uploadRouter from "./routes/upload";
 export function createServer() {
   const app = express();
 
-  app.use(cors());
+  app.use(cors({
+  origin: "https://proud-sand-0b0709500.7.azurestaticapps.net",
+  methods: ["GET", "POST", "PUT", "DELETE"],
+  allowedHeaders: ["Content-Type"]
+}));
   app.use(express.json());
   app.use(express.urlencoded({ extended: true }));
 

@@ -5,6 +5,7 @@ import type { MenuItem } from "../lib/api";
 import { addMenu, getMenu } from "../lib/api";
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "";
+console.log("API URL:", import.meta.env.VITE_API_BASE_URL);
 
 export default function Menu() {
   const [formData, setFormData] = useState({
