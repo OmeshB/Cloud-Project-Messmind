@@ -75,12 +75,17 @@ router.post("/ai-insight", async (req, res) => {
   try {
     const data = req.body;
 
-    const rawInsight = await getAIInsight(data);
+    let rawInsight = "";
 
-    // ✅ SAFETY: handle empty/invalid AI response
+    try {
+      rawInsight = await getAIInsight(data);
+    } catch (err) {
+      console.error("AI SERVICE FAILED:", err);
+    }
+
     if (!rawInsight || typeof rawInsight !== "string") {
       return res.json({
-        insight: "⚠️ AI could not generate insight. Try again.",
+        insight: "⚠️ AI service not responding (check API key/config)",
       });
     }
 
@@ -94,20 +99,17 @@ router.post("/ai-insight", async (req, res) => {
       );
 
       if (isUnsafe) {
-        finalInsight =
-          "⚠️ AI insight was filtered due to safety concerns.";
+        finalInsight = "⚠️ AI insight was filtered due to safety concerns.";
       }
     }
 
-    // ✅ ALWAYS return valid JSON
     res.json({ insight: finalInsight });
 
   } catch (err) {
     console.error("AI Insight error:", err);
 
-    // ✅ NEVER send empty response
     res.json({
-      insight: "⚠️ AI service failed. Please try again later.",
+      insight: "⚠️ Backend crashed while generating AI insight",
     });
   }
 });
