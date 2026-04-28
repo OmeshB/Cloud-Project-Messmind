@@ -28,7 +28,7 @@ function expressPlugin(): Plugin {
     apply: "serve",
     async configureServer(server) {
       // ✅ Import ONLY during dev, not build
-      const { createServer } = await import("./server");
+      const { createServer } = await import("./server/index.ts");
 
       const app = createServer();
       server.middlewares.use(app);

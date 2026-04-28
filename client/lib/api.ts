@@ -1,4 +1,4 @@
-const API_BASE_URL =  import.meta.env.VITE_API_BASE_URL ??   "https://messmind-app-cqb9gkagg7exgrcf.centralindia-01.azurewebsites.net";
+const API_BASE_URL = "https://messmind-backend-container.nicewater-34fe2781.southindia.azurecontainerapps.io";
 console.log("API BASE URL:", API_BASE_URL);
 // 🔧 Generic API handler
 async function apiRequest<T>(
