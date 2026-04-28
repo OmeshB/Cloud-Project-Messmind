@@ -1,0 +1,26 @@
+# ── Dev environment overrides ────────────────────────────
+replicaCount:
+  frontend: 1
+  backend: 1
+
+image:
+  frontend:
+    tag: latest
+  backend:
+    tag: latest
+
+service:
+  frontend:
+    type: NodePort   # Cheaper — no cloud LoadBalancer needed in dev
+  backend:
+    type: ClusterIP
+
+resources:
+  frontend:
+    limits:
+      cpu: "100m"
+      memory: "64Mi"
+  backend:
+    limits:
+      cpu: "250m"
+      memory: "256Mi"

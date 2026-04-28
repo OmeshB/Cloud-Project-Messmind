@@ -1,0 +1,13 @@
+apiVersion: v2
+name: messmind
+description: Helm chart for the Messmind college mess management application
+type: application
+version: 1.0.0
+appVersion: "1.0.0"
+keywords:
+  - messmind
+  - college-mess
+  - food-management
+home: https://github.com/omeshbala/messmind
+maintainers:
+  - name: omeshbala
