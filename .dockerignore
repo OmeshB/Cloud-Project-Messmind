@@ -35,8 +35,8 @@ data
 .env
 load-ids.txt
 
-server
-tmp
+# server source is needed for the backend Docker image build
+# server
 types
 .git
 .gitignore

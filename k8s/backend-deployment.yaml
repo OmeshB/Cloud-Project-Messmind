@@ -1,0 +1,120 @@
+# ─────────────────────────────────────────────────────────
+# Messmind Backend — Kubernetes Deployment
+# Image: omeshbala/messmind-backend:latest  (Docker Hub)
+# Port:  5000  (Express server)
+# ─────────────────────────────────────────────────────────
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: messmind-backend
+  namespace: messmind
+  labels:
+    app: messmind
+    component: backend
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: messmind
+      component: backend
+  template:
+    metadata:
+      labels:
+        app: messmind
+        component: backend
+    spec:
+      containers:
+        - name: backend
+          image: omeshbala/messmind-backend:latest
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 5000
+          env:
+            # ── Database ──────────────────────────────────
+            - name: DB_SERVER
+              valueFrom:
+                secretKeyRef:
+                  name: messmind-secrets
+                  key: DB_SERVER
+            - name: DB_DATABASE
+              valueFrom:
+                secretKeyRef:
+                  name: messmind-secrets
+                  key: DB_DATABASE
+            - name: DB_USER
+              valueFrom:
+                secretKeyRef:
+                  name: messmind-secrets
+                  key: DB_USER
+            - name: DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: messmind-secrets
+                  key: DB_PASSWORD
+            - name: DB_PORT
+              value: "1433"
+            # ── Azure Storage ─────────────────────────────
+            - name: AZURE_STORAGE_CONNECTION_STRING
+              valueFrom:
+                secretKeyRef:
+                  name: messmind-secrets
+                  key: AZURE_STORAGE_CONNECTION_STRING
+            - name: AZURE_STORAGE_CONTAINER_NAME
+              value: "menu-images"
+            # ── AI Keys ───────────────────────────────────
+            - name: GEMINI_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: messmind-secrets
+                  key: GEMINI_API_KEY
+            - name: GROQ_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: messmind-secrets
+                  key: GROQ_API_KEY
+            - name: AZURE_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: messmind-secrets
+                  key: AZURE_API_KEY
+            - name: AZURE_ENDPOINT
+              valueFrom:
+                secretKeyRef:
+                  name: messmind-secrets
+                  key: AZURE_ENDPOINT
+            - name: AZURE_DEPLOYMENT
+              value: "gpt-4o-mini"
+            - name: AZURE_API_VERSION
+              value: "2024-02-15-preview"
+            # ── Content Safety ────────────────────────────
+            - name: AZURE_CONTENT_SAFETY_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: messmind-secrets
+                  key: AZURE_CONTENT_SAFETY_KEY
+            - name: AZURE_CONTENT_SAFETY_ENDPOINT
+              valueFrom:
+                secretKeyRef:
+                  name: messmind-secrets
+                  key: AZURE_CONTENT_SAFETY_ENDPOINT
+            - name: PORT
+              value: "5000"
+          resources:
+            requests:
+              cpu: "100m"
+              memory: "256Mi"
+            limits:
+              cpu: "500m"
+              memory: "512Mi"
+          readinessProbe:
+            httpGet:
+              path: /api/ping
+              port: 5000
+            initialDelaySeconds: 10
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /api/ping
+              port: 5000
+            initialDelaySeconds: 20
+            periodSeconds: 30
