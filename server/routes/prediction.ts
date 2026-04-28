@@ -59,6 +59,17 @@ router.get("/", async (_req, res) => {
   }
 });
 
+// 🔥 HEALTH / DEBUG ROUTE
+router.get("/health", (req, res) => {
+  res.json({
+    status: "ok",
+    timestamp: new Date().toISOString(),
+    geminiKeyExists: !!process.env.GEMINI_API_KEY,
+    groqKeyExists: !!process.env.GROQ_API_KEY,
+    version: "1.0.1"
+  });
+});
+
 // 🔥 AI ROUTE
 router.post("/ai-insight", async (req, res) => {
   try {
