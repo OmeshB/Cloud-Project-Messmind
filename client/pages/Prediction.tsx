@@ -7,7 +7,7 @@ import {
 } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import type { PredictionData } from "../lib/api";
-import { getPrediction } from "../lib/api";
+import { getPrediction, getAIInsight } from "../lib/api";
 
 export default function Prediction() {
   const [data, setData] = useState<PredictionData | null>(null);
@@ -39,15 +39,7 @@ export default function Prediction() {
     try {
       setAiLoading(true);
 
-      const res = await fetch("/api/prediction/ai-insight", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(data),
-      });
-
-      const json = await res.json();
+      const json = await getAIInsight(data);
       setAiInsight(json.insight || "No insight generated");
     } catch (err) {
       console.error("AI Insight error:", err);
