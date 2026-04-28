@@ -13,7 +13,12 @@ export function createServer() {
   const app = express();
 
   app.use(cors({
-  origin: "https://proud-sand-0b0709500.7.azurestaticapps.net",
+  origin: [
+    "https://proud-sand-0b0709500.7.azurestaticapps.net",      // Azure Static Web App
+    "https://messmind-app-cqb9gkagg7exgrcf.centralindia-01.azurewebsites.net", // Azure App Service
+    "http://localhost:3000",  // local Docker
+    "http://localhost:8080",  // local Vite dev
+  ],
   methods: ["GET", "POST", "PUT", "DELETE"],
   allowedHeaders: ["Content-Type"]
 }));

@@ -1,4 +1,4 @@
-const API_BASE_URL = "https://messmind-backend-container.nicewater-34fe2781.southindia.azurecontainerapps.io";
+const API_BASE_URL = "https://messmind-app-cqb9gkagg7exgrcf.centralindia-01.azurewebsites.net";
 console.log("API BASE URL:", API_BASE_URL);
 // 🔧 Generic API handler
 async function apiRequest<T>(
