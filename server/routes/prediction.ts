@@ -66,10 +66,14 @@ router.post("/ai-insight", async (req, res) => {
 
     const rawInsight = await getAIInsight(data);
 
-    const moderation = await moderateText(rawInsight);
+    // ✅ SAFETY: handle empty/invalid AI response
+    if (!rawInsight || typeof rawInsight !== "string") {
+      return res.json({
+        insight: "⚠️ AI could not generate insight. Try again.",
+      });
+    }
 
-    console.log("MODERATION RESULT:", moderation);
-    console.log("AI USED:", rawInsight);
+    const moderation = await moderateText(rawInsight);
 
     let finalInsight = rawInsight;
 
@@ -84,12 +88,15 @@ router.post("/ai-insight", async (req, res) => {
       }
     }
 
+    // ✅ ALWAYS return valid JSON
     res.json({ insight: finalInsight });
+
   } catch (err) {
     console.error("AI Insight error:", err);
-    res.status(500).json({
-      message: "Error generating AI insight",
-      error: err instanceof Error ? err.message : String(err),
+
+    // ✅ NEVER send empty response
+    res.json({
+      insight: "⚠️ AI service failed. Please try again later.",
     });
   }
 });
