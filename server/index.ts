@@ -1,7 +1,7 @@
 import "dotenv/config";
 import express from "express";
 import cors from "cors";
-import rateLimit from "express-rate-limit"; // ✅ ADD THIS
+import rateLimit from "express-rate-limit";
 
 import { handleDemo } from "./routes/demo";
 import { getMenu, addMenu } from "./routes/menu";
@@ -13,14 +13,13 @@ import uploadRouter from "./routes/upload";
 export function createServer() {
   const app = express();
 
-  // ✅ ADD RATE LIMITER HERE
   const limiter = rateLimit({
-    windowMs: 15 * 60 * 1000, // 15 minutes
-    max: 100, // limit each IP to 100 requests
+    windowMs: 15 * 60 * 1000,
+    max: 100,
     message: "Too many requests, please try again later.",
   });
 
-  app.use(limiter); // ✅ APPLY GLOBALLY
+  app.use(limiter);
 
   const corsOptions = {
     origin: [
@@ -43,6 +42,16 @@ export function createServer() {
 
   app.get("/api/ping", (_req, res) => {
     res.json({ message: "ping" });
+  });
+
+  // ✅ NEW: Metrics endpoint (for monitoring demo)
+  app.get("/api/metrics", (_req, res) => {
+    res.json({
+      requests: Math.floor(Math.random() * 100),
+      errors: Math.floor(Math.random() * 10),
+      uptime: process.uptime(),
+      timestamp: new Date().toISOString(),
+    });
   });
 
   app.get("/api/demo", handleDemo);
