@@ -24,7 +24,7 @@ export function createServer() {
     optionsSuccessStatus: 200, // Some browsers (Safari) choke on 204
   };
   app.use(cors(corsOptions));
-  app.options("/*", cors(corsOptions)); // Handle ALL preflight OPTIONS requests
+  app.options(/.*/, cors(corsOptions)); // Handle ALL preflight OPTIONS requests
   app.use(express.json());
   app.use(express.urlencoded({ extended: true }));
 
