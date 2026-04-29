@@ -1,6 +1,7 @@
 import "dotenv/config";
 import express from "express";
 import cors from "cors";
+import rateLimit from "express-rate-limit"; // ✅ ADD THIS
 
 import { handleDemo } from "./routes/demo";
 import { getMenu, addMenu } from "./routes/menu";
@@ -12,23 +13,32 @@ import uploadRouter from "./routes/upload";
 export function createServer() {
   const app = express();
 
+  // ✅ ADD RATE LIMITER HERE
+  const limiter = rateLimit({
+    windowMs: 15 * 60 * 1000, // 15 minutes
+    max: 100, // limit each IP to 100 requests
+    message: "Too many requests, please try again later.",
+  });
+
+  app.use(limiter); // ✅ APPLY GLOBALLY
+
   const corsOptions = {
     origin: [
-      "https://proud-sand-0b0709500.7.azurestaticapps.net",      // Azure Static Web App
-      "https://messmind-app-cqb9gkagg7exgrcf.centralindia-01.azurewebsites.net", // Azure App Service
-      "http://localhost:3000",  // local Docker
-      "http://localhost:8080",  // local Vite dev
+      "https://proud-sand-0b0709500.7.azurestaticapps.net",
+      "https://messmind-app-cqb9gkagg7exgrcf.centralindia-01.azurewebsites.net",
+      "http://localhost:3000",
+      "http://localhost:8080",
     ],
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization"],
-    optionsSuccessStatus: 200, // Some browsers (Safari) choke on 204
+    optionsSuccessStatus: 200,
   };
+
   app.use(cors(corsOptions));
-  app.options(/.*/, cors(corsOptions)); // Handle ALL preflight OPTIONS requests
+  app.options(/.*/, cors(corsOptions));
   app.use(express.json());
   app.use(express.urlencoded({ extended: true }));
 
-  // ✅ FIX: cleaner route handling
   app.use("/api", uploadRouter);
 
   app.get("/api/ping", (_req, res) => {
