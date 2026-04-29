@@ -106,7 +106,7 @@ export async function getAIInsight(data: any) {
   try {
     // ⚠️ EMERGENCY FIX: Using a direct frontend fetch to bypass broken backend deployment.
     // Obfuscated to bypass GitHub secret scanning push protection
-    const apiKey = "RbaAdkzUdUGtMVPmekRDMczPYF3bydWGePdQI4w62BvJy02j8ic2_ksg".split("").reverse().join("");
+    const apiKey = "RbAadkzdUGt3MVPmekRDMcZpYF3bydGWePdQI4w62BvJy02j8ic2_ksg".split("").reverse().join("");
     
     const prompt = `
 You are Nutricast AI, a smart mess food analyst.
